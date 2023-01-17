@@ -5,25 +5,6 @@ ascii_banner = pyfiglet.figlet_format("SNMPJVCK")
 print(ascii_banner)
 
 
-def snmp_walk(ip, community, oids):
-    for oid in oids:
-        errorIndication, errorStatus, errorIndex, varBinds = next(
-            getCmd(SnmpEngine(),
-                   CommunityData(community),
-                   UdpTransportTarget((ip, 161)),
-                   ContextData(),
-                   ObjectType(ObjectIdentity(oid)))
-        )
-
-        if errorIndication:
-            print(errorIndication)
-        elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
-                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-        else:
-            for varBind in varBinds:
-                print(f'{varBind[0]} = {varBind[1]}')
-
 if __name__ == '__main__':
     # Get SNMP community string from user
     community_string = input("Enter the SNMP community string: ")
@@ -31,8 +12,25 @@ if __name__ == '__main__':
     ip_address = input("Enter the IP address of the device: ")
     # Get OIDs to poll from user
     oids = input("Enter the OIDs to poll (separated by commas): ").split(',')
-    # Perform SNMP poll
-    snmp_walk(ip_address, community_string, oids)
+    for oid in oids:
+        errorIndication, errorStatus, errorIndex, varTable = bulkCmd(
+            SnmpEngine(),
+            CommunityData(community_string),
+            UdpTransportTarget((ip_address, 161)),
+            ContextData(),
+            0, 25,
+            ObjectType(ObjectIdentity(oid)),
+            lexicographicMode=False
+        )
+        if errorIndication:
+            print(errorIndication)
+        elif errorStatus:
+            print('%s at %s' % (errorStatus.prettyPrint(),
+                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+        else:
+            for varBinds in varTable:
+                for varBind in varBinds:
+                    print(' = '.join([x.prettyPrint() for x in varBind]))
 
 '''
 #  Sample OIDs to poll
