@@ -33,10 +33,5 @@ The script then checks for any error in the response. If an error is found, it w
 
 You can also add other OIDs as per your requirement, and also you can add the exception handling and other functionalities as per your requirements.
 
-It's important to note that the OIDs can vary depending on the device's manufacturer and model, so it's important to consult the device's documentation or contact the manufacturer for a list of available OIDs.
-
-You can also add other OIDs as per your requirement, and also you can add the exception handling and other functionalities as per your requirements.
-
-
 
 Follow me @SudoJvck
